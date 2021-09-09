@@ -39,7 +39,7 @@
         android:textColor="#000000"
         app:backgroundTint="#FFFFFF"
         tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="144dp"
+        tools:layout_editor_absoluteX="135dp"
         tools:layout_editor_absoluteY="667dp" />
 
     <Button
@@ -49,9 +49,9 @@
         android:text="Seleccionar Foto"
         android:textColor="#000000"
         app:backgroundTint="#FFFFFF"
+        tools:ignore="MissingConstraints"
         tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="71dp"
-        tools:ignore="MissingConstraints" />
+        tools:layout_editor_absoluteY="140dp" />
 
     <Button
         android:id="@+id/button4"
@@ -61,8 +61,8 @@
         android:textColor="#000000"
         app:backgroundTint="#FFFFFF"
         tools:ignore="MissingConstraints"
-        tools:layout_editor_absoluteX="284dp"
-        tools:layout_editor_absoluteY="71dp" />
+        tools:layout_editor_absoluteX="288dp"
+        tools:layout_editor_absoluteY="140dp" />
 
     <ImageView
         android:id="@+id/imageView3"
@@ -70,6 +70,7 @@
         android:layout_height="275dp"
         tools:layout_editor_absoluteX="3dp"
         tools:layout_editor_absoluteY="220dp"
-        tools:srcCompat="@tools:sample/backgrounds/scenic" />
+        tools:srcCompat="@tools:sample/backgrounds/scenic"
+        tools:ignore="MissingConstraints" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
