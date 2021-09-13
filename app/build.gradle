@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.tp6"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -36,4 +36,7 @@ dependencies {
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+    implementation 'com.github.dhaval2404:imagepicker-support:1.7.1'
+
+
 }
