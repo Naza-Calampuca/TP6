@@ -4,8 +4,11 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import com.microsoft.projectoxford.face.*;
@@ -13,6 +16,10 @@ import com.microsoft.projectoxford.face.contract.*;
 
 import com.github.dhaval2404.imagepicker.ImagePicker;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -40,8 +47,38 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
+
+       // procesarImagenObtenida();
+
+
+    }
+/*
+    private void procesarImagenObtenida() {
+
+        Log.d("ProcesarImagen", "Armo el  Stream para el procesamiento");
+        ByteArrayOutputStream streamSalida = new ByteArrayOutputStream();
+        imagenAProcesar.compress(Bitmap.CompressFormat.JPEG, 100, streamSalida);
+        ByteArrayInputStream streamEntrada=new ByteArrayInputStream(streamSalida.toByteArray());
+
+
+        Log.d("ProcesarImagen", "Declaro la clase del AsyncTask");
+
+        class procesarImagen extends AsyncTask<InputStream, String, Face[]> {
+
+
+
+
+        }
+
+        procesarImagen miTarea= new procesarImagen();
+        miTarea.execute(streamEntrada);
+
     }
 
+
+
+ */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
