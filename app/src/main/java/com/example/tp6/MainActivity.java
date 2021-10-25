@@ -24,7 +24,7 @@ import java.io.InputStream;
 public class MainActivity extends AppCompatActivity {
 
     ImageView cover;
-    FloatingActionButton fab;
+    FloatingActionButton boton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,9 +32,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         cover = findViewById(R.id.coverImg);
-        fab = findViewById(R.id.floatingActionButton);
+        boton = findViewById(R.id.floatingActionButton);
 
-        fab.setOnClickListener(new View.OnClickListener() {
+        boton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 ImagePicker.Companion.with(MainActivity.this)
@@ -49,16 +49,14 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-       // procesarImagenObtenida();
 
 
     }
-/*
-    private void procesarImagenObtenida() {
+
+    private void procesarImagenObtenida(Uri imageuri) {
 
         Log.d("ProcesarImagen", "Armo el  Stream para el procesamiento");
         ByteArrayOutputStream streamSalida = new ByteArrayOutputStream();
-        imagenAProcesar.compress(Bitmap.CompressFormat.JPEG, 100, streamSalida);
         ByteArrayInputStream streamEntrada=new ByteArrayInputStream(streamSalida.toByteArray());
 
 
@@ -66,9 +64,44 @@ public class MainActivity extends AppCompatActivity {
 
         class procesarImagen extends AsyncTask<InputStream, String, Face[]> {
 
+            @Override
+            protected Face[] doInBackground(InputStream...imagenAProcesar){
+                publishProgress("Detectando caras... ");
 
+                Face[] resultado=null;
+                try {
 
+                    Log.d("ProcesarImagen", "Defino qué atributos quiero procesar");
+                    FaceServiceClient.FaceAttributeType[] atributos;
+                    atributos= new FaceServiceClient.FaceAttributeType[] {
 
+                            FaceServiceClient.FaceAttributeType.Age,
+                            FaceServiceClient.FaceAttributeType.Glasses,
+                            FaceServiceClient.FaceAttributeType.Smile,
+                            FaceServiceClient.FaceAttributeType.FacialHair,
+                            FaceServiceClient.FaceAttributeType.Gender
+
+                    };
+                    Log.d("ProcesarImagen", "Llamo al procesamiento de la imagen");
+                    resultado=servicioProcesamientoImagen.detect (imagenAProcesar[0], true, false, atributos);
+                } catch (Exception error) {
+                    Log.d("ProcesarImagen", "Error: "+error.getMessage());
+                }
+                return resultado;
+            }
+
+            @Override
+            protected void onPreExecute(){
+                super.onPreExecute();
+                dialogoDeProgreso.show();
+            }
+            @Override
+            protected void onProgressUpdate(String...mensajeProceso){
+                super.onProgressUpdate(mensajeProceso);
+                dialogoDeProceso.setMessage(mensajeProceso[0]);
+            }
+            @Override
+            protected void onPostExecute(Face[] resultado){}
         }
 
         procesarImagen miTarea= new procesarImagen();
@@ -78,12 +111,15 @@ public class MainActivity extends AppCompatActivity {
 
 
 
- */
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        Uri uri = data.getData();
-        cover.setImageURI(uri);
+        Uri imageuri = data.getData();
+        cover.setImageURI(imageuri);
+       procesarImagenObtenida(imageuri);
+
+
     }
 }
