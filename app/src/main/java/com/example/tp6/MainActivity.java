@@ -3,6 +3,7 @@ package com.example.tp6;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+        dialogoDeProgreso = new ProgressDialog(this);
         cover = findViewById(R.id.coverImg);
         boton = findViewById(R.id.floatingActionButton);
 
@@ -57,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d("ProcesarImagen", "Armo el  Stream para el procesamiento");
         ByteArrayOutputStream streamSalida = new ByteArrayOutputStream();
-        ByteArrayInputStream streamEntrada=new ByteArrayInputStream(streamSalida.toByteArray());
+        ByteArrayInputStream streamEntrada = new ByteArrayInputStream(streamSalida.toByteArray());
 
 
         Log.d("ProcesarImagen", "Declaro la clase del AsyncTask");
@@ -65,15 +68,15 @@ public class MainActivity extends AppCompatActivity {
         class procesarImagen extends AsyncTask<InputStream, String, Face[]> {
 
             @Override
-            protected Face[] doInBackground(InputStream...imagenAProcesar){
+            protected Face[] doInBackground(InputStream... imagenAProcesar) {
                 publishProgress("Detectando caras... ");
 
-                Face[] resultado=null;
+                Face[] resultado = null;
                 try {
 
                     Log.d("ProcesarImagen", "Defino qué atributos quiero procesar");
                     FaceServiceClient.FaceAttributeType[] atributos;
-                    atributos= new FaceServiceClient.FaceAttributeType[] {
+                    atributos = new FaceServiceClient.FaceAttributeType[]{
 
                             FaceServiceClient.FaceAttributeType.Age,
                             FaceServiceClient.FaceAttributeType.Glasses,
@@ -83,34 +86,53 @@ public class MainActivity extends AppCompatActivity {
 
                     };
                     Log.d("ProcesarImagen", "Llamo al procesamiento de la imagen");
-                    resultado=servicioProcesamientoImagen.detect (imagenAProcesar[0], true, false, atributos);
+                    resultado = servicioProcesamientoImagen.detect(imagenAProcesar[0], true, false, atributos);
                 } catch (Exception error) {
-                    Log.d("ProcesarImagen", "Error: "+error.getMessage());
+                    Log.d("ProcesarImagen", "Error: " + error.getMessage());
                 }
                 return resultado;
             }
 
             @Override
-            protected void onPreExecute(){
+            protected void onPreExecute() {
                 super.onPreExecute();
                 dialogoDeProgreso.show();
             }
+
             @Override
-            protected void onProgressUpdate(String...mensajeProceso){
+            protected void onProgressUpdate(String... mensajeProceso) {
                 super.onProgressUpdate(mensajeProceso);
                 dialogoDeProceso.setMessage(mensajeProceso[0]);
             }
-            @Override
-            protected void onPostExecute(Face[] resultado){}
-        }
 
-        procesarImagen miTarea= new procesarImagen();
+            @Override
+            protected void onPostExecute(Face[] resultado) {
+                super.onPostExecute(resultado);
+                dialogoDeProgreso.dismiss();
+
+                if (resultado == null) {
+                    txtResultado.setText("Error en el procesamiento");
+                } else {
+                    if (resultado.length > 0) {
+                        Log.d("ProcesarImagen", "Mando a recuadrar las caras");
+                        recuadrarCaras(imageuri, resultado);
+
+                        Log.d("ProcesarImagen", "Mando a procesar los resultados de las caras");
+                        procesarResultadosDeCaras(resultado);
+                    } else {
+                        Log.d("ProcesarImagen", "No se detectó ninguna caripela");
+                        txtResultado.setText("No se detectó ninguna caripela");
+                    }
+                }
+            }
+        }
+            procesarImagen miTarea = new procesarImagen();
         miTarea.execute(streamEntrada);
 
-    }
+        }
 
 
-
+void recuadrarCaras (Bitmap imageOriginal,Face[] )
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
