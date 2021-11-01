@@ -5,7 +5,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -56,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //aunque no lo parezca esta bien copiado
+
     private void procesarImagenObtenida(Uri imageuri) {
 
         Log.d("ProcesarImagen", "Armo el  Stream para el procesamiento");
@@ -66,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
         Log.d("ProcesarImagen", "Declaro la clase del AsyncTask");
 
         class procesarImagen extends AsyncTask<InputStream, String, Face[]> {
-
             @Override
             protected Face[] doInBackground(InputStream... imagenAProcesar) {
                 publishProgress("Detectando caras... ");
@@ -115,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
                 } else {
                     if (resultado.length > 0) {
                         Log.d("ProcesarImagen", "Mando a recuadrar las caras");
-                        recuadrarCaras(imageuri, resultado);
+                        recuadrarCaras(imageuri, resultado);  //Creo que esto es solo para bitmap
 
                         Log.d("ProcesarImagen", "Mando a procesar los resultados de las caras");
                         procesarResultadosDeCaras(resultado);
@@ -132,8 +137,90 @@ public class MainActivity extends AppCompatActivity {
         }
 
 
-void recuadrarCaras (Bitmap imageOriginal,Face[] )
+void recuadrarCaras (Bitmap imageOriginal,Face[] carasARecuadrar){
 
+        Bitmap imagenADibujar;
+        imagenADibujar=imageOriginal.copy(Bitmap.Config.ARGB_8888,true);
+
+        Log.d("RecuadrarCaras", "Armo el canvas y el pincel");
+        Canvas lienzo;
+        lienzo=new Canvas(imagenADibujar);
+    Paint pincel;
+    pincel=new Paint();
+
+        pincel.setAntiAlias(true);
+        pincel.setStyle(Paint.Style.STROKE);
+        pincel.setColor(Color.RED);
+        pincel.setStrokeWidth(5);
+    Log.d("RecuadrarCaras", "Para cada cara recibida dibujar su rectangulo");
+
+    for (Face unaCara:carasARecuadrar){
+        FaceRectangle rectanguloUnaCara;
+        rectanguloUnaCara=unaCara.faceRectangle;
+
+        lienzo.drawRect( rectanguloUnaCara.left,
+        rectanguloUnaCara.top,
+rectanguloUnaCara.left+rectanguloUnaCara.width,
+                rectanguloUnaCara.top+rectanguloUnaCara.height,
+                pincel);
+
+    }
+
+    Log.d("RecuadrarCaras", "Pongo la imagen resultante en el ImageView");
+    imgResultado.setImageBitmap(imagenADibujar);
+
+}
+
+void procesarResultadosDeCaras(Face[] carasAProcesar){
+
+    int cantidadHombres, cantidadMujeres;
+    cantidadHombres=preferencias.getInt("cantidadHombre", 0);
+    cantidadMujeres=preferencias.getInt("cantidadHombre", 0);
+
+    Log.d("procesarImagen", "Armo el mensaje con información");
+    String mensaje;
+    mensaje="";
+    for (int punteroCara=0; punteroCara<carasAProcesar.length;punteroCara++) {
+
+mensaje+="Edad: " + carasAProcesar [punteroCara].faceAttributes.age;
+        mensaje+=" - Sonrisa: " + carasAProcesar [punteroCara].faceAttributes.smile;
+        mensaje+=" - Barba: " + carasAProcesar [punteroCara].faceAttributes.facialHair.beard;
+        mensaje+=" - Genero: " + carasAProcesar [punteroCara].faceAttributes.gender;
+        mensaje+=" - Anteojos: " + carasAProcesar [punteroCara].faceAttributes.glasses;
+
+    if ( carasAProcesar[punteroCara]. faceAttributes.gender.equals("male") ) {
+        cantidadHombres++;
+    } else {
+        cantidadMujeres++;
+    }
+
+        SharedPreferences.Editor editorDePreferencias;
+        editorDePreferencias=preferencias.edit();
+        editorDePreferencias.putInt("cantidadHombres", cantidadHombres);
+        editorDePreferencias.putInt("cantidadMujeres", cantidadMujeres);
+        editorDePreferencias.commit();
+
+
+if (punteroCara<carasAProcesar.length-1){
+    mensaje=""
+
+    }
+
+
+    }
+
+
+}
+
+
+
+
+
+
+
+
+
+        /*
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -144,4 +231,7 @@ void recuadrarCaras (Bitmap imageOriginal,Face[] )
 
 
     }
+
+
+ */
 }
