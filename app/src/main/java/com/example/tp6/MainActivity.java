@@ -202,13 +202,15 @@ mensaje+="Edad: " + carasAProcesar [punteroCara].faceAttributes.age;
 
 
 if (punteroCara<carasAProcesar.length-1){
-    mensaje=""
+    mensaje="\n";
 
     }
 
 
     }
 
+    mensaje +=" -H:" +cantidadHombres+" -M:" +cantidadMujeres;
+    txtResultado.setText(mensaje);
 
 }
 
