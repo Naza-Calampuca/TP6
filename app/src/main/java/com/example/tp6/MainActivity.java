@@ -4,6 +4,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -16,6 +17,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
+
 import com.microsoft.projectoxford.face.*;
 import com.microsoft.projectoxford.face.contract.*;
 
@@ -30,6 +33,9 @@ public class MainActivity extends AppCompatActivity {
 
     ImageView cover;
     FloatingActionButton boton;
+    TextView txtResultado;
+    FaceServiceClient servicioProcesamientoImagenes;
+    SharedPreferences preferencias;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,10 +43,28 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
 
-        dialogoDeProgreso = new ProgressDialog(this);
+        //dialogoDeProgreso = new ProcessDialog(this);
+        txtResultado=findViewById(R.id.textViewResultados);
         cover = findViewById(R.id.coverImg);
         boton = findViewById(R.id.floatingActionButton);
 
+        Log.d("Inicio","inicializo el SharedPreferences");
+        preferencias = getSharedPreferences("Naza", Context.MODE_PRIVATE);
+
+        Log.d("Inicio","Defino credenciales para usar la API");
+        String apiEndpoint = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0";
+        String subscriptionKey = ""; //NO SE COMO CONSEGUIR LA KEY
+
+        try {
+            Log.d("Inicio","Voy instanciar el servicio");
+            servicioProcesamientoImagenes = new FaceServiceClient(apiEndpoint,subscriptionKey);
+            Log.d("Inicio","Servicio instanciado exitosamente");
+        } catch (Exception error){
+            Log.d("Inicio","Error en inicializacion"+ error.getMessage());
+        }
+
+
+//SELECCIONAR IMAGEN
         boton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -56,16 +80,15 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-
-
     }
 
-    //aunque no lo parezca esta bien copiado
 
     private void procesarImagenObtenida(Uri imageuri) {
 
         Log.d("ProcesarImagen", "Armo el  Stream para el procesamiento");
         ByteArrayOutputStream streamSalida = new ByteArrayOutputStream();
+
+        //DEBERIA COMPRIMIR DE ALGUNA MANERA EL IMAGE URI?
         ByteArrayInputStream streamEntrada = new ByteArrayInputStream(streamSalida.toByteArray());
 
 
@@ -74,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         class procesarImagen extends AsyncTask<InputStream, String, Face[]> {
             @Override
             protected Face[] doInBackground(InputStream... imagenAProcesar) {
-                publishProgress("Detectando caras... ");
+                //publishProgress("Detectando caras... ");
 
                 Face[] resultado = null;
                 try {
@@ -91,13 +114,13 @@ public class MainActivity extends AppCompatActivity {
 
                     };
                     Log.d("ProcesarImagen", "Llamo al procesamiento de la imagen");
-                    resultado = servicioProcesamientoImagen.detect(imagenAProcesar[0], true, false, atributos);
+                    resultado = servicioProcesamientoImagenes.detect(imagenAProcesar[0], true, false, atributos);
                 } catch (Exception error) {
                     Log.d("ProcesarImagen", "Error: " + error.getMessage());
                 }
                 return resultado;
             }
-
+/*
             @Override
             protected void onPreExecute() {
                 super.onPreExecute();
@@ -109,24 +132,24 @@ public class MainActivity extends AppCompatActivity {
                 super.onProgressUpdate(mensajeProceso);
                 dialogoDeProceso.setMessage(mensajeProceso[0]);
             }
-
+*/
             @Override
             protected void onPostExecute(Face[] resultado) {
                 super.onPostExecute(resultado);
-                dialogoDeProgreso.dismiss();
+               // dialogoDeProgreso.dismiss();
 
                 if (resultado == null) {
                     txtResultado.setText("Error en el procesamiento");
                 } else {
                     if (resultado.length > 0) {
                         Log.d("ProcesarImagen", "Mando a recuadrar las caras");
-                        recuadrarCaras(imageuri, resultado);  //Creo que esto es solo para bitmap
+                       // recuadrarCaras(imageuri, resultado);  //COMO LO ADAPTO PARA URI?
 
                         Log.d("ProcesarImagen", "Mando a procesar los resultados de las caras");
                         procesarResultadosDeCaras(resultado);
                     } else {
                         Log.d("ProcesarImagen", "No se detectó ninguna caripela");
-                        txtResultado.setText("No se detectó ninguna caripela");
+                        txtResultado.setText("No se detectó ninguna cara");
                     }
                 }
             }
@@ -136,11 +159,14 @@ public class MainActivity extends AppCompatActivity {
 
         }
 
-
-void recuadrarCaras (Bitmap imageOriginal,Face[] carasARecuadrar){
+/*
+void recuadrarCaras (Uri imageOriginal,Face[] carasARecuadrar){
 
         Bitmap imagenADibujar;
         imagenADibujar=imageOriginal.copy(Bitmap.Config.ARGB_8888,true);
+
+        //SE PUEDE ESCRIBIR EN UN URI DE ALGUNA MANERA??
+
 
         Log.d("RecuadrarCaras", "Armo el canvas y el pincel");
         Canvas lienzo;
@@ -167,9 +193,13 @@ rectanguloUnaCara.left+rectanguloUnaCara.width,
     }
 
     Log.d("RecuadrarCaras", "Pongo la imagen resultante en el ImageView");
-    imgResultado.setImageBitmap(imagenADibujar);
+    cover.setImageBitmap(imagenADibujar);
 
 }
+
+
+
+*/
 
 void procesarResultadosDeCaras(Face[] carasAProcesar){
 
@@ -219,10 +249,7 @@ if (punteroCara<carasAProcesar.length-1){
 
 
 
-
-
-
-        /*
+//ON ACTIVITY RESULT SIRVE PARA QUE SE EJECUTEN COSAS DESPUES
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -235,5 +262,5 @@ if (punteroCara<carasAProcesar.length-1){
     }
 
 
- */
+
 }
