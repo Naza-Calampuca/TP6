@@ -53,11 +53,11 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d("Inicio","Defino credenciales para usar la API");
         String apiEndpoint = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0";
-        String subscriptionKey = ""; //NO SE COMO CONSEGUIR LA KEY
+        String subscriptionKey = "293152f2991b40ed8845fd5687d31274";
 
         try {
             Log.d("Inicio","Voy instanciar el servicio");
-            servicioProcesamientoImagenes = new FaceServiceClient(apiEndpoint,subscriptionKey);
+            servicioProcesamientoImagenes =new FaceServiceRestClient(apiEndpoint,subscriptionKey);
             Log.d("Inicio","Servicio instanciado exitosamente");
         } catch (Exception error){
             Log.d("Inicio","Error en inicializacion"+ error.getMessage());
@@ -89,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
         ByteArrayOutputStream streamSalida = new ByteArrayOutputStream();
 
         //DEBERIA COMPRIMIR DE ALGUNA MANERA EL IMAGE URI?
+
         ByteArrayInputStream streamEntrada = new ByteArrayInputStream(streamSalida.toByteArray());
 
 
