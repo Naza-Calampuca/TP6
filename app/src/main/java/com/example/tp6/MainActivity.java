@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity {
         preferencias = getSharedPreferences("Naza", Context.MODE_PRIVATE);
 
         Log.d("Inicio","Defino credenciales para usar la API");
-        String apiEndpoint = "https://westcentralus.api.cognitive.microsoft.com/face/v1.0";
+        String apiEndpoint = "https://visionservicedai.cognitiveservices.azure.com/face/v1.0";
         String subscriptionKey = "0634b45d88ba439e80d05964716fa4c4";
 
         try {
@@ -205,7 +205,7 @@ boton.setEnabled(true);
                // dialogoDeProgreso.dismiss();
 
                 if (resultado == null) {
-                    txtResultado.setText("Error en el procesamiento");
+                    txtResultado.setText("ERROR EN EL PROCESAMIENTO");
                 } else {
                     if (resultado.length > 0) {
                         Log.d("ProcesarImagen", "Mando a recuadrar las caras");
